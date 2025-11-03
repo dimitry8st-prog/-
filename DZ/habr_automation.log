@@ -1,0 +1,38 @@
+2025-11-02 21:28:21,037 - INFO - Инициализация Playwright...
+2025-11-02 21:28:21,663 - INFO - Запуск браузера (headless=True)...
+2025-11-02 21:28:22,868 - INFO - Браузер успешно запущен
+2025-11-02 21:28:22,868 - INFO - Переход на сайт: https://habr.com
+2025-11-02 21:28:52,891 - ERROR - Ошибка при загрузке страницы: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://habr.com/", waiting until "networkidle"
+
+2025-11-02 21:28:52,892 - ERROR - Ошибка в основном потоке: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://habr.com/", waiting until "networkidle"
+
+2025-11-02 21:28:52,990 - INFO - Браузер закрыт
+2025-11-02 21:28:53,026 - INFO - Playwright остановлен
+2025-11-02 21:31:47,772 - INFO - Инициализация Playwright...
+2025-11-02 21:31:48,323 - INFO - Запуск браузера (headless=True)...
+2025-11-02 21:31:49,553 - INFO - Браузер успешно запущен
+2025-11-02 21:31:49,553 - INFO - Переход на сайт: https://habr.com
+2025-11-02 21:32:19,565 - ERROR - Ошибка при загрузке страницы: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://habr.com/", waiting until "networkidle"
+
+2025-11-02 21:32:19,565 - ERROR - Ошибка в основном потоке: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://habr.com/", waiting until "networkidle"
+
+2025-11-02 21:32:19,669 - INFO - Браузер закрыт
+2025-11-02 21:32:19,688 - INFO - Playwright остановлен
+2025-11-02 21:53:42,819 - INFO - Инициализация Playwright...
+2025-11-02 21:53:43,427 - INFO - Запуск браузера (headless=True)...
+2025-11-02 21:53:44,653 - INFO - Браузер успешно запущен
+2025-11-02 21:53:49,215 - INFO - Проверка подключения: OK
+2025-11-02 21:53:49,215 - INFO - Переход на сайт: https://habr.com
+2025-11-02 21:54:22,875 - INFO - Найден селектор: article
+2025-11-02 21:54:22,875 - INFO - Страница успешно загружена
+2025-11-02 21:54:25,102 - INFO - Скриншот сохранен: screenshots/habr_com_20251102_215422.png
+2025-11-02 21:54:25,200 - INFO - Браузер закрыт
+2025-11-02 21:54:25,218 - INFO - Playwright остановлен
