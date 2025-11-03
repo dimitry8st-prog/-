@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Платежная система с ЮKassa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .product-info {
+            margin-bottom: 30px;
+        }
+
+        .product-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            font-size: 32px;
+            color: #4CAF50;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .buy-button {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .buy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .buy-button:active {
+            transform: translateY(0);
+        }
+
+        .buy-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .success-icon {
+            color: #4CAF50;
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .error-icon {
+            color: #f44336;
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1001;
+        }
+
+        /* Адаптивность для мобильных */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .product-title {
+                font-size: 20px;
+            }
+
+            .product-price {
+                font-size: 28px;
+            }
+
+            .buy-button {
+                padding: 15px 30px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="product-info">
+            <div class="product-title">Премиум подписка</div>
+            <div class="product-price">990 ₽</div>
+            <p>Доступ ко всем функциям на 1 месяц</p>
+        </div>
+
+        <button class="buy-button" id="buyButton" onclick="initPayment()">
+            <span id="buttonText">Купить сейчас</span>
+            <div class="spinner" id="spinner"></div>
+        </button>
+
+        <div id="paymentForm" style="display: none; margin-top: 20px;">
+            <h3>Тестовые данные для оплаты</h3>
+            <p><strong>Карта:</strong> 5555 5555 5555 4477</p>
+            <p><strong>Срок:</strong> 01/30</p>
+            <p><strong>CVV:</strong> 123</p>
+            <button onclick="processPayment()" style="margin: 10px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Оплатить</button>
+            <button onclick="cancelPayment()" style="margin: 10px; padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div class="payment-modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">✓</div>
+            <h2>Оплата прошла успешно!</h2>
+            <p>Спасибо за покупку. Премиум доступ активирован.</p>
+            <button onclick="closeModal('successModal')" style="margin-top: 20px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>
+        </div>
+    </div>
+
+    <div class="payment-modal" id="errorModal">
+        <div class="modal-content">
+            <div class="error-icon">✕</div>
+            <h2>Оплата не выполнена</h2>
+            <p>Платеж был отменен или произошла ошибка.</p>
+            <button onclick="closeModal('errorModal')" style="margin-top: 20px; padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Понятно</button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Состояние платежа в localStorage
+        const paymentState = {
+            initiated: false,
+            completed: false,
+            timestamp: null
+        };
+
+        // Загрузка состояния при загрузке страницы
+        function loadPaymentState() {
+            const saved = localStorage.getItem('paymentState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                if (state.completed) {
+                    showNotification('Ваша подписка активна!', 'success');
+                }
+            }
+        }
+
+        // Сохранение состояния
+        function savePaymentState() {
+            localStorage.setItem('paymentState', JSON.stringify(paymentState));
+        }
+
+        // Валидация формы
+        function validateForm() {
+            return true;
+        }
+
+        // Инициализация платежа
+        function initPayment() {
+            if (!validateForm()) {
+                showNotification('Пожалуйста, проверьте данные', 'error');
+                return;
+            }
+
+            showLoading(true);
+            paymentState.initiated = true;
+            paymentState.timestamp = new Date().toISOString();
+            savePaymentState();
+
+            // Имитация загрузки
+            setTimeout(() => {
+                showLoading(false);
+                document.getElementById('paymentForm').style.display = 'block';
+                document.getElementById('buyButton').style.display = 'none';
+            }, 1500);
+        }
+
+        // Обработка платежа
+        function processPayment() {
+            showLoading(true);
+            
+            // Имитация процесса оплаты
+            setTimeout(() => {
+                showLoading(false);
+                paymentState.completed = true;
+                savePaymentState();
+                document.getElementById('successModal').style.display = 'flex';
+                showNotification('Оплата прошла успешно!', 'success');
+                
+                // Сброс формы
+                resetPaymentForm();
+            }, 2000);
+        }
+
+        // Отмена платежа
+        function cancelPayment() {
+            paymentState.initiated = false;
+            savePaymentState();
+            document.getElementById('errorModal').style.display = 'flex';
+            resetPaymentForm();
+        }
+
+        // Сброс формы платежа
+        function resetPaymentForm() {
+            document.getElementById('paymentForm').style.display = 'none';
+            document.getElementById('buyButton').style.display = 'block';
+        }
+
+        // Показать/скрыть загрузку
+        function showLoading(show) {
+            const spinner = document.getElementById('spinner');
+            const buttonText = document.getElementById('buttonText');
+            const buyButton = document.getElementById('buyButton');
+            
+            if (show) {
+                spinner.style.display = 'block';
+                buttonText.style.display = 'none';
+                buyButton.disabled = true;
+            } else {
+                spinner.style.display = 'none';
+                buttonText.style.display = 'block';
+                buyButton.disabled = false;
+            }
+        }
+
+        // Закрыть модальное окно
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Показать уведомление
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.background = type === 'success' ? '#4CAF50' : '#f44336';
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Обработчик прерывания
+        function handleInterruption() {
+            if (paymentState.initiated && !paymentState.completed) {
+                if (confirm('Платеж в процессе. Вы уверены, что хотите уйти?')) {
+                    paymentState.initiated = false;
+                    savePaymentState();
+                }
+            }
+        }
+
+        // Инициализация при загрузке
+        window.addEventListener('load', loadPaymentState);
+        window.addEventListener('beforeunload', handleInterruption);
+
+        // Адаптация для мобильных
+        function checkMobile() {
+            if (window.innerWidth <= 768) {
+                document.body.classList.add('mobile');
+            } else {
+                document.body.classList.remove('mobile');
+            }
+        }
+
+        window.addEventListener('resize', checkMobile);
+        checkMobile();
+    </script>
+</body>
+</html>
